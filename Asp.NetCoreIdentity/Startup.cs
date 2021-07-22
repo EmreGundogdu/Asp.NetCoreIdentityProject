@@ -34,6 +34,8 @@ namespace Asp.NetCoreIdentity
                 opt.Password.RequireLowercase = true;
                 opt.Password.RequireUppercase = true;
                 opt.Password.RequireNonAlphanumeric = true;
+                opt.SignIn.RequireConfirmedEmail = true;
+
             }).AddEntityFrameworkStores<ApplicationContext>();
             services.AddDbContext<ApplicationContext>(options =>
             {
@@ -58,6 +60,10 @@ namespace Asp.NetCoreIdentity
             });
 
             app.UseRouting();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
