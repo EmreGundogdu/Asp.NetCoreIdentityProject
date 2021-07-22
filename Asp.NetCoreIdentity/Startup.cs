@@ -27,7 +27,14 @@ namespace Asp.NetCoreIdentity
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<ApplicationContext>();
+            services.AddIdentity<AppUser, AppRole>(opt=>
+            {
+                opt.Password.RequireDigit = true;
+                opt.Password.RequiredLength = 1;
+                opt.Password.RequireLowercase = true;
+                opt.Password.RequireUppercase = true;
+                opt.Password.RequireNonAlphanumeric = true;
+            }).AddEntityFrameworkStores<ApplicationContext>();
             services.AddDbContext<ApplicationContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("SqlConnection"));
