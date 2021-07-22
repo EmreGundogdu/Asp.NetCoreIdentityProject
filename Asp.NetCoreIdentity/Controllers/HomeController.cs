@@ -1,4 +1,6 @@
-﻿using Asp.NetCoreIdentity.Models;
+﻿using Asp.NetCoreIdentity.Entities;
+using Asp.NetCoreIdentity.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,6 +11,13 @@ namespace Asp.NetCoreIdentity.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly UserManager<AppUser> _userManager;
+
+        public HomeController(UserManager<AppUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -18,11 +27,25 @@ namespace Asp.NetCoreIdentity.Controllers
             return View(new UserCreateModel());
         }
         [HttpPost]
-        public IActionResult Create(UserCreateModel model)
+        public async Task<IActionResult> Create(UserCreateModel model)
         {
             if (ModelState.IsValid)
             {
-
+                AppUser user = new()
+                {
+                    Email = model.Email,
+                    Gender = model.Gender,
+                    UserName = model.UserName
+                };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index");
+                }
+                foreach (var item in result.Errors)
+                {
+                    ModelState.AddModelError("", item.Description);
+                }
             }
             return View(model);
         }
