@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="\node_modules\bootstrap\dist\css\bootstrap.min.css" rel="stylesheet" />
+    <title>Identity App</title>
+</head>
+<body>
+    <header>        
+        @await Html.PartialAsync("_navbar")
+    </header>
+    <section>
+        <div class="container mt-3">
+            @RenderBody()
+        </div>
+    </section>
+    <script src="\node_modules\bootstrap\dist\js\bootstrap.bundle.min.js"></script>
+</body>
+</html>
