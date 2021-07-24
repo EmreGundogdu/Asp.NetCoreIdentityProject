@@ -27,7 +27,7 @@ namespace Asp.NetCoreIdentity
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddIdentity<AppUser, AppRole>(opt=>
+            services.AddIdentity<AppUser, AppRole>(opt =>
             {
                 opt.Password.RequireDigit = true;
                 opt.Password.RequiredLength = 1;
@@ -37,6 +37,17 @@ namespace Asp.NetCoreIdentity
                 opt.SignIn.RequireConfirmedEmail = true;
 
             }).AddEntityFrameworkStores<ApplicationContext>();
+
+            services.ConfigureApplicationCookie(opt =>
+            {
+                opt.Cookie.HttpOnly = false;
+                opt.Cookie.SameSite = SameSiteMode.Strict;
+                opt.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                opt.Cookie.Name = "IdentityCookie";
+                opt.ExpireTimeSpan = TimeSpan.FromDays(25);
+                opt.LoginPath = new PathString("/Home/SignIn");
+            });
+
             services.AddDbContext<ApplicationContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("SqlConnection"));

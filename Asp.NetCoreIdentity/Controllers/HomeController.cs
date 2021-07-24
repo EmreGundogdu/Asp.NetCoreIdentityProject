@@ -48,12 +48,16 @@ namespace Asp.NetCoreIdentity.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await _roleManager.CreateAsync(new()
+                    var memberRole = await _roleManager.FindByNameAsync("Member");
+                    if (memberRole == null)
                     {
-                        Name = "Admin",
-                        CreatedTime = DateTime.Now
-                    });
-                    await _userManager.AddToRoleAsync(user, "Admin");
+                        await _roleManager.CreateAsync(new()
+                        {
+                            Name = "Member",
+                            CreatedTime = DateTime.Now
+                        });
+                    }
+                    await _userManager.AddToRoleAsync(user, "Member");
                     return RedirectToAction("Index");
                 }
                 foreach (var item in result.Errors)
@@ -63,9 +67,9 @@ namespace Asp.NetCoreIdentity.Controllers
             }
             return View(model);
         }
-        public IActionResult SignIn()
+        public IActionResult SignIn(string returnUrl)
         {
-            return View();
+            return View(new UserSignInModel { ReturnUrl = returnUrl });
         }
         public async Task<IActionResult> SignIn(UserSignInModel model)
         {
@@ -74,6 +78,20 @@ namespace Asp.NetCoreIdentity.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, false, true);
                 if (result.Succeeded)
                 {
+                    if (!string.IsNullOrWhiteSpace(model.ReturnUrl))
+                    {
+                        return Redirect(model.ReturnUrl);
+                    }
+                    var user = await _userManager.FindByNameAsync(model.UserName);
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles.Contains("Admin"))
+                    {
+                        return RedirectToAction("AdminPanel");
+                    }
+                    else
+                    {
+                        return RedirectToAction("Panel");
+                    }
 
                 }
                 else if (result.IsLockedOut)
@@ -92,6 +110,21 @@ namespace Asp.NetCoreIdentity.Controllers
         {
             var userName = User.Identity.Name;
             var role = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role).Value;
+            return View();
+        }
+        [Authorize(Roles = "Admin")]
+        public IActionResult AdminPanel()
+        {
+            return View();
+        }
+        [Authorize(Roles = "Member")]
+        public IActionResult Panel()
+        {
+            return View();
+        }
+        [Authorize(Roles = "Member")]
+        public IActionResult MemberPage()
+        {
             return View();
         }
     }

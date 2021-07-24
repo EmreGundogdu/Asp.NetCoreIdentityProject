@@ -1,5 +1,6 @@
 ﻿@model UserSignInModel
 <form asp-action="SignIn" asp-controller="Home" method="post" class="p-3 mx-auto w-175 shadow">
+    <input type="hidden" asp-for="ReturnUrl"  />
     <div class="mb-3">
         <label>User Name:</label>
         <span class="text-danger" asp-validation-for="UserName"></span>
