@@ -24,6 +24,10 @@ namespace Asp.NetCoreIdentity.Controllers
             _signInManager = signInManager;
             _roleManager = roleManager;
         }
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
 
         public IActionResult Index()
         {
@@ -76,14 +80,14 @@ namespace Asp.NetCoreIdentity.Controllers
         {
             if (ModelState.IsValid)
             {
+                var user = await _userManager.FindByNameAsync(model.UserName);
                 var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, true);
                 if (result.Succeeded)
                 {
                     if (!string.IsNullOrWhiteSpace(model.ReturnUrl))
                     {
                         return Redirect(model.ReturnUrl);
-                    }
-                    var user = await _userManager.FindByNameAsync(model.UserName);
+                    }                    
                     var roles = await _userManager.GetRolesAsync(user);
                     if (roles.Contains("Admin"))
                     {
@@ -94,10 +98,26 @@ namespace Asp.NetCoreIdentity.Controllers
                         return RedirectToAction("Panel");
                     }
                 }
+                else if (result.IsLockedOut)
+                {
+                    var lockOutEnd = await _userManager.GetLockoutEndDateAsync(user);
+                    ModelState.AddModelError("", $"The Account locked for {(lockOutEnd.Value.UtcDateTime-DateTime.UtcNow).Minutes} minutes");
+                }
                 else
                 {
-                    ModelState.AddModelError("", "Username Or Password Wrong");
-                }               
+                    var message = string.Empty;
+
+                    if (user != null)
+                    {
+                        var failedCount = await _userManager.GetAccessFailedCountAsync(user);
+                        message = $" Last {(_userManager.Options.Lockout.MaxFailedAccessAttempts - failedCount)} try.";
+                    }
+                    else
+                    {
+                        message = "Username or Password wrong";
+                    }
+                    ModelState.AddModelError("", message);
+                }                
             }
             return View(model);
         }
@@ -108,7 +128,7 @@ namespace Asp.NetCoreIdentity.Controllers
             var role = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role).Value;
             return View();
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Member")]
         public IActionResult AdminPanel()
         {
             return View();

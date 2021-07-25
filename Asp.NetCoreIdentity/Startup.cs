@@ -36,6 +36,7 @@ namespace Asp.NetCoreIdentity
                 opt.Password.RequireUppercase = false;
                 opt.Password.RequireNonAlphanumeric = false;
                 opt.SignIn.RequireConfirmedEmail = true;
+                opt.Lockout.MaxFailedAccessAttempts = 5;
 
             }).AddErrorDescriber<CustomErrorDescriber>().AddEntityFrameworkStores<ApplicationContext>();
 
@@ -47,6 +48,7 @@ namespace Asp.NetCoreIdentity
                 opt.Cookie.Name = "IdentityCookie";
                 opt.ExpireTimeSpan = TimeSpan.FromDays(25);
                 opt.LoginPath = new PathString("/Home/SignIn");
+                opt.AccessDeniedPath = new PathString("/Home/AccessDenied");
             });
 
             services.AddDbContext<ApplicationContext>(options =>
