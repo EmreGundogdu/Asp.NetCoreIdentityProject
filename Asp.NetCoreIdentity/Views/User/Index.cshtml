@@ -1,0 +1,22 @@
+﻿@model List<AppUser>
+<table>
+    <thead>
+
+        <tr>
+            <th>Username</th>
+            <th>Gender</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.UserName</td>
+                <td>@item.Gender</td>
+                <td>@item.Email</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
