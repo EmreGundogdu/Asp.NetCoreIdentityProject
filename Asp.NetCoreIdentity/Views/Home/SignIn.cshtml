@@ -1,6 +1,6 @@
 ﻿@model UserSignInModel
 <form asp-action="SignIn" asp-controller="Home" method="post" class="p-3 mx-auto w-175 shadow">
-    <input type="hidden" asp-for="ReturnUrl"  />
+    <input type="hidden" asp-for="ReturnUrl" />
     <div class="mb-3">
         <label>User Name:</label>
         <span class="text-danger" asp-validation-for="UserName"></span>
@@ -11,6 +11,13 @@
         <span class="text-danger" asp-validation-for="Password"></span>
         <input type="password" asp-for="Password" class="form-control" />
     </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" asp-for="RememberMe">
+        <label class="form-check-label" for="flexCheckDefault">
+            Remember Me
+        </label>
+    </div>
+
     <div class="mb-3">
         <button type="submit" class="btn btn-outline-primary">Save</button>
     </div>

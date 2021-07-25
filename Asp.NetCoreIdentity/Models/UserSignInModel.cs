@@ -12,6 +12,7 @@ namespace Asp.NetCoreIdentity.Models
         public string UserName { get; set; }
         [Required(ErrorMessage ="Password Is Required")]
         public string Password { get; set; }
+        public bool RememberMe { get; set; }
         public string ReturnUrl { get; set; }
     }
 }

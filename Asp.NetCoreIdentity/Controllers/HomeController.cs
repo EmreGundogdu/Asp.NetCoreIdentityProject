@@ -71,11 +71,12 @@ namespace Asp.NetCoreIdentity.Controllers
         {
             return View(new UserSignInModel { ReturnUrl = returnUrl });
         }
+        [HttpPost]
         public async Task<IActionResult> SignIn(UserSignInModel model)
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, false, true);
+                var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, true);
                 if (result.Succeeded)
                 {
                     if (!string.IsNullOrWhiteSpace(model.ReturnUrl))
@@ -92,16 +93,11 @@ namespace Asp.NetCoreIdentity.Controllers
                     {
                         return RedirectToAction("Panel");
                     }
-
                 }
-                else if (result.IsLockedOut)
+                else
                 {
-
-                }
-                else if (result.IsNotAllowed)
-                {
-
-                }
+                    ModelState.AddModelError("", "Username Or Password Wrong");
+                }               
             }
             return View(model);
         }
@@ -126,6 +122,11 @@ namespace Asp.NetCoreIdentity.Controllers
         public IActionResult MemberPage()
         {
             return View();
+        }
+        public async Task<IActionResult> SignOut()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index");
         }
     }
 }
