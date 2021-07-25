@@ -1,4 +1,5 @@
 using Asp.NetCoreIdentity.Context;
+using Asp.NetCoreIdentity.CustomDescriber;
 using Asp.NetCoreIdentity.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,7 +37,7 @@ namespace Asp.NetCoreIdentity
                 opt.Password.RequireNonAlphanumeric = false;
                 opt.SignIn.RequireConfirmedEmail = true;
 
-            }).AddEntityFrameworkStores<ApplicationContext>();
+            }).AddErrorDescriber<CustomErrorDescriber>().AddEntityFrameworkStores<ApplicationContext>();
 
             services.ConfigureApplicationCookie(opt =>
             {
