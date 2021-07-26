@@ -27,30 +27,39 @@ namespace Asp.NetCoreIdentity.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var query = _userManager.Users;
-            var users = _context.Users.Join(_context.UserRoles, user => user.Id, userrole => userrole.UserId, (user, userrole) => new
-            {
-                user,
-                userrole
-            }).Join(_context.Roles, two => two.userrole.RoleId, role => role.Id, (two, role) => new { two.user, two.userrole, role }).Where(x => x.userrole.RoleId != 3).select(x => new appuser()
-            {
-                id = x.user.id,
-                accessfailedcount = x.user.accessfailedcount,
-                concurrencystamp = x.user.concurrencystamp,
-                email = x.user.email,
-                gender = x.user.gender,
-                imagepath = x.user.imagepath,
-                lockoutenabled = x.user.lockoutenabled,
-                lockoutend = x.user.lockoutend,
-                normalizedemail = x.user.normalizedemail,
-                normalizedusername = x.user.normalizedusername,
-                passwordhash = x.user.passwordhash,
-                phonenumber = x.user.phonenumber,
-                username = x.user.username
+            //var query = _userManager.Users;
+            //var users = _context.Users.Join(_context.UserRoles, user => user.Id, userrole => userrole.UserId, (user, userrole) => new
+            //{
+            //    user,
+            //    userrole
+            //}).Join(_context.Roles, two => two.userrole.RoleId, role => role.Id, (two, role) => new { two.user, two.userrole, role }).Where(x => x.userrole.RoleId != 3).Select(x => new AppUser()
+            //{
+            //    Id = x.user.Id,
+            //    AccessFailedCount = x.user.AccessFailedCount,
+            //    ConcurrencyStamp = x.user.ConcurrencyStamp,
+            //    Email = x.user.Email,
+            //    Gender = x.user.Gender,
+            //    ImagePath = x.user.ImagePath,
+            //    LockoutEnabled = x.user.LockoutEnabled,
+            //    LockoutEnd = x.user.LockoutEnd,
+            //    NormalizedEmail = x.user.NormalizedEmail,
+            //    NormalizedUserName = x.user.NormalizedUserName,
+            //    PasswordHash = x.user.PasswordHash,
+            //    PhoneNumber = x.user.PhoneNumber,
+            //    UserName = x.user.UserName
 
-            }).tolist();
-            //var users = await _userManager.GetUsersInRoleAsync("Member");
-            return View(users);
+            //}).ToList();
+            ////var users = await _userManager.GetUsersInRoleAsync("Member");
+            //return View(users);
+            List<AppUser> filteredUsers = new();
+            var users = _userManager.Users.ToList();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles.Contains("Admin"))
+                    filteredUsers.Add(user);
+            }
+            return View(filteredUsers);
         }
         public IActionResult Create()
         {
@@ -71,7 +80,7 @@ namespace Asp.NetCoreIdentity.Controllers
                 if (result.Succeeded)
                 {
                     var memberRole = await _roleManager.FindByNameAsync("Member");
-                    if (memberRole==null)
+                    if (memberRole == null)
                     {
                         await _roleManager.CreateAsync(new()
                         {
@@ -87,6 +96,46 @@ namespace Asp.NetCoreIdentity.Controllers
                 }
             }
             return View(model);
+        }
+        public async Task<IActionResult> AssignRole(int id)
+        {
+            var user = _userManager.Users.SingleOrDefault(x => x.Id == id);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var roles = _roleManager.Roles.ToList();
+            RoleAssignSendModel model = new();
+            List<RoleAssignListModel> list = new();
+            foreach (var role in roles)
+            {
+                list.Add(new()
+                {
+                    Name = role.Name,
+                    RoleId = role.Id,
+                    Exist = userRoles.Contains(role.Name)
+                });
+            }
+            model.Roles = list;
+            model.UserId = id;
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AssignRole(RoleAssignSendModel model)
+        {
+            var user = _userManager.Users.SingleOrDefault(x=>x.Id == model.UserId);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var item in model.Roles)
+            {
+                if (item.Exist)
+                {
+                    if (userRoles.Contains(item.Name)) 
+                        await _userManager.AddToRoleAsync(user, item.Name);
+                }
+                else
+                {
+                    if (userRoles.Contains(item.Name))
+                        await _userManager.RemoveFromRoleAsync(user, item.Name);
+                }
+            }
+            return RedirectToAction("Index");
         }
     }
 }

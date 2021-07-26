@@ -19,7 +19,7 @@
                     <td>@item.Gender</td>
                     <td>@item.Email</td>
                     <td><getUserInfo user-id="@item.Id" /></td>
-                    <td></td>
+                    <td><a asp-action="AssignRole" asp-route-id="@item.Id">Assign Role</a></td>
                 </tr>
             }
 

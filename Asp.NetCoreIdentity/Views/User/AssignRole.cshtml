@@ -1,0 +1,20 @@
+﻿@model RoleAssignSendModel
+<form asp-action="AssignRole" asp-controller="User" method="post" class="p-3 mx-auto w-175 shadow">
+    <input type="hidden" asp-for="@Model.UserId" />
+    <ul class="list-group">
+        @for (int i = 0; i < Model.Roles.Count; i++)
+        {
+            <input type="hidden" asp-for="@Model.Roles[i].Name" />
+            <input type="hidden" asp-for="@Model.Roles[i].RoleId" />
+            <li class="list-group-item">
+                <input class="form-check-input me-1" asp-for="@Model.Roles[i].Exist">
+                @Model.Roles[i].Name
+            </li>
+        }
+
+    </ul>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-outline-primary">Save</button>
+    </div>
+    <div class="text-danger mt-5" asp-validation-summary="ModelOnly"></div>
+</form>
