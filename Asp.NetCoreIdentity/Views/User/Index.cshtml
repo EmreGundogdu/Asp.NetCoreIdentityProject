@@ -1,22 +1,23 @@
 ﻿@model List<AppUser>
-<table class="table table-hovered table-bordered table-shadow table-md">
-    <thead>
+    <a asp-action="Create" asp-controller="User" class="btn btn-outline-primary my-2 d-inline-block">Add User</a>
+    <table class="table table-hovered table-bordered table-shadow table-md">
+        <thead>
 
-        <tr>
-            <th>Username</th>
-            <th>Gender</th>
-            <th>Email</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
             <tr>
-                <td>@item.UserName</td>
-                <td>@item.Gender</td>
-                <td>@item.Email</td>
+                <th>Username</th>
+                <th>Gender</th>
+                <th>Email</th>
             </tr>
-        }
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.UserName</td>
+                    <td>@item.Gender</td>
+                    <td>@item.Email</td>
+                </tr>
+            }
 
-    </tbody>
-</table>
+        </tbody>
+    </table>

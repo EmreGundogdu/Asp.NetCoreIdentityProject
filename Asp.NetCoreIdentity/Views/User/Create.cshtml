@@ -1,0 +1,22 @@
+﻿@model UserAdminCreateModel
+<form asp-action="Create" asp-controller="User" method="post" class="p-3 mx-auto w-175 shadow">
+    <div class="mb-3">
+        <label>User Name:</label>
+        <span class="text-danger" asp-validation-for="UserName"></span>
+        <input asp-for="UserName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Email:</label>
+        <span class="text-danger" asp-validation-for="Email"></span>
+        <input type="email" asp-for="Email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Gender:</label>
+        <span class="text-danger" asp-validation-for="Gender"></span>
+        <input asp-for="Gender" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-outline-primary">Save</button>
+    </div>
+    <div class="text-danger mt-5" asp-validation-summary="ModelOnly"></div>
+</form>
