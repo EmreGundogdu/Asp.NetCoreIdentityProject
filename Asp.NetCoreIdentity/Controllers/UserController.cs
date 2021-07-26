@@ -16,38 +16,40 @@ namespace Asp.NetCoreIdentity.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<AppRole> _roleManager;
+        private readonly ApplicationContext _context;
 
-        public UserController(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
+        public UserController(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, ApplicationContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
-            //var query = _userManager.Users;
-            //var users = _conext.Users.Join(_conext.UserRoles, user => user.Id, userRole => userRole.UserId, (user, userRole) => new
-            //{
-            //    user,
-            //    userRole
-            //}).Join(_conext.Roles,two=>two.userRole.RoleId,role=>role.Id,(two,role)=>new { two.user,two.userRole,role}).Where(x => x.userRole.RoleId != 3).Select(x => new AppUser()
-            //{
-            //    Id = x.user.Id,
-            //    AccessFailedCount = x.user.AccessFailedCount,
-            //    ConcurrencyStamp = x.user.ConcurrencyStamp,
-            //    Email = x.user.Email,
-            //    Gender = x.user.Gender,
-            //    ImagePath = x.user.ImagePath,
-            //    LockoutEnabled = x.user.LockoutEnabled,
-            //    LockoutEnd = x.user.LockoutEnd,
-            //    NormalizedEmail = x.user.NormalizedEmail,
-            //    NormalizedUserName = x.user.NormalizedUserName,
-            //    PasswordHash = x.user.PasswordHash,
-            //    PhoneNumber = x.user.PhoneNumber,
-            //    UserName = x.user.UserName
+            var query = _userManager.Users;
+            var users = _context.Users.Join(_context.UserRoles, user => user.Id, userrole => userrole.UserId, (user, userrole) => new
+            {
+                user,
+                userrole
+            }).Join(_context.Roles, two => two.userrole.RoleId, role => role.Id, (two, role) => new { two.user, two.userrole, role }).Where(x => x.userrole.RoleId != 3).select(x => new appuser()
+            {
+                id = x.user.id,
+                accessfailedcount = x.user.accessfailedcount,
+                concurrencystamp = x.user.concurrencystamp,
+                email = x.user.email,
+                gender = x.user.gender,
+                imagepath = x.user.imagepath,
+                lockoutenabled = x.user.lockoutenabled,
+                lockoutend = x.user.lockoutend,
+                normalizedemail = x.user.normalizedemail,
+                normalizedusername = x.user.normalizedusername,
+                passwordhash = x.user.passwordhash,
+                phonenumber = x.user.phonenumber,
+                username = x.user.username
 
-            //}).ToList();
-            var users = await _userManager.GetUsersInRoleAsync("Member");
+            }).tolist();
+            //var users = await _userManager.GetUsersInRoleAsync("Member");
             return View(users);
         }
         public IActionResult Create()
