@@ -1,0 +1,12 @@
+﻿@model RoleCreateModel
+<form asp-action="Create" asp-controller="User" method="post" class="p-3 mx-auto w-175 shadow">
+    <div class="mb-3">
+        <label>Role Name:</label>
+        <span class="text-danger" asp-validation-for="Name"></span>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-outline-primary">Save</button>
+    </div>
+    <div class="text-danger mt-5" asp-validation-summary="ModelOnly"></div>
+</form>
